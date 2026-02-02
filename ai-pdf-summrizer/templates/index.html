@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI PDF Summarizer - Smart Document Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📄 AI PDF Summarizer</h1>
+            <p class="tagline">Instant summaries • Multi-language • AI Chat • Mind Maps • OCR Support</p>
+        </header>
+
+        <div class="main-grid">
+            <div class="card">
+                <h2 class="card-title">⬆️ Upload Document</h2>
+                
+                <div class="message error" id="errorMessage"></div>
+
+                <form id="uploadForm">
+                    <div class="file-upload" id="fileUpload">
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">📎</div>
+                        <div>Click or drag PDF (up to 50MB)</div>
+                        <input type="file" id="fileInput" name="file" accept=".pdf">
+                    </div>
+                    <div class="file-name" id="fileName"></div>
+
+                    <div class="options">
+                        <div class="option-group">
+                            <label>Language</label>
+                            <select name="language" id="language">
+                                <option value="english">English</option>
+                                <option value="spanish">Spanish</option>
+                                <option value="chinese">Chinese</option>
+                                <option value="hindi">Hindi</option>
+                                <option value="urdu">Urdu</option>
+                                <option value="french">French</option>
+                                <option value="german">German</option>
+                                <option value="japanese">Japanese</option>
+                                <option value="korean">Korean</option>
+                                <option value="arabic">Arabic</option>
+                                <option value="portuguese">Portuguese</option>
+                            </select>
+                        </div>
+
+                        <div class="option-group">
+                            <label>Target Audience</label>
+                            <select name="audience" id="audience">
+                                <option value="general">General</option>
+                                <option value="ceo">CEO/Executive</option>
+                                <option value="lawyer">Legal Professional</option>
+                                <option value="researcher">Researcher</option>
+                                <option value="student">Student</option>
+                            </select>
+                        </div>
+
+                        <div class="option-group">
+                            <label>Summary Length</label>
+                            <select name="summary_length" id="summaryLength">
+                                <option value="short">Short</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="detailed">Detailed</option>
+                            </select>
+                        </div>
+
+                        <div class="option-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="keyPoints">
+                                <label style="margin: 0; text-transform: none;">Extract Key Points</label>
+                            </div>
+                        </div>
+
+                        <div class="option-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="mindmap">
+                                <label style="margin: 0; text-transform: none;">Generate Mind Map</label>
+                            </div>
+                        </div>
+
+                        <div class="option-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="useOcr">
+                                <label style="margin: 0; text-transform: none;">OCR for Scanned PDFs</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="submitBtn">
+                        ✨ Generate Summary
+                    </button>
+                </form>
+            </div>
+
+            <div class="card results-section">
+                <h2 class="card-title">✨ Results</h2>
+
+                <div class="empty-state" id="emptyState">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">📋</div>
+                    <div>Your AI summary will appear here</div>
+                </div>
+
+                <div class="loading" id="loadingState">
+                    <div class="spinner"></div>
+                    <div>Processing your document...</div>
+                </div>
+
+                <div class="results-content" id="resultsContent">
+                    <div class="metadata" id="metadata"></div>
+                    
+                    <div class="tabs">
+                        <button class="tab active" data-tab="summary">Summary</button>
+                        <button class="tab" data-tab="keypoints" id="keypointsTab" style="display:none;">Key Points</button>
+                        <button class="tab" data-tab="mindmap" id="mindmapTab" style="display:none;">Mind Map</button>
+                        <button class="tab" data-tab="chat">AI Chat</button>
+                    </div>
+
+                    <div class="tab-content active" id="summary">
+                        <div class="summary-text" id="summaryText"></div>
+                    </div>
+
+                    <div class="tab-content" id="keypoints">
+                        <div class="key-points">
+                            <h3 style="margin-bottom: 1rem;">🎯 Key Points</h3>
+                            <div id="keyPointsContent"></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="mindmap">
+                        <div class="mindmap-container" id="mindmapContainer"></div>
+                    </div>
+
+                    <div class="tab-content" id="chat">
+                        <div class="chat-container" id="chatContainer">
+                            <div style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                                Ask questions about your document...
+                            </div>
+                        </div>
+                        <div class="chat-input-group">
+                            <input type="text" class="chat-input" id="chatInput" placeholder="Ask a question...">
+                            <button class="btn-secondary" id="chatSendBtn">Send</button>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-secondary" id="copyBtn">📋 Copy</button>
+                        <button class="btn-secondary" id="downloadBtn">⬇️ Download</button>
+                        <button class="btn-secondary" id="convertBtn">📝 To Text</button>
+                        <button class="btn-secondary" id="newBtn">🔄 New</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
